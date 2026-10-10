@@ -1,0 +1,385 @@
+
+--[[
+    NEKO HUB
+    Version: 1.0
+    UI de entrenamiento para Roblox Studio
+    RightShift = mostrar / ocultar
+]]
+
+local Players = game:GetService("Players")
+local UIS = game:GetService("UserInputService")
+
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- CONFIGURACION
+local PURPLE = Color3.fromRGB(155, 80, 255)
+local BG = Color3.fromRGB(15, 15, 22)
+local CARD = Color3.fromRGB(29, 29, 41)
+local TEXT = Color3.fromRGB(245, 245, 255)
+local MUTED = Color3.fromRGB(165, 165, 185)
+
+-- LIMPIAR VERSION ANTERIOR
+local old = playerGui:FindFirstChild("NekoHub")
+if old then
+    old:Destroy()
+end
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "NekoHub"
+gui.ResetOnSpawn = false
+gui.IgnoreGuiInset = true
+gui.Parent = playerGui
+
+-- VENTANA PRINCIPAL
+local window = Instance.new("Frame")
+window.Name = "MainWindow"
+window.Size = UDim2.fromOffset(680, 450)
+window.Position = UDim2.new(0.5, -340, 0.5, -225)
+window.BackgroundColor3 = BG
+window.BorderSizePixel = 0
+window.Parent = gui
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 14)
+corner.Parent = window
+
+local stroke = Instance.new("UIStroke")
+stroke.Color = PURPLE
+stroke.Transparency = 0.25
+stroke.Thickness = 1.4
+stroke.Parent = window
+
+-- CABECERA
+local header = Instance.new("Frame")
+header.Size = UDim2.new(1, 0, 0, 65)
+header.BackgroundColor3 = Color3.fromRGB(21, 20, 31)
+header.BorderSizePixel = 0
+header.Parent = window
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, -100, 0, 32)
+title.Position = UDim2.fromOffset(20, 7)
+title.BackgroundTransparency = 1
+title.Text = "🐈 NEKO HUB"
+title.TextColor3 = TEXT
+title.Font = Enum.Font.GothamBold
+title.TextSize = 22
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.Parent = header
+
+local subtitle = Instance.new("TextLabel")
+subtitle.Size = UDim2.new(1, -100, 0, 20)
+subtitle.Position = UDim2.fromOffset(22, 36)
+subtitle.BackgroundTransparency = 1
+subtitle.Text = "Visual Training • v1.0"
+subtitle.TextColor3 = MUTED
+subtitle.Font = Enum.Font.Gotham
+subtitle.TextSize = 12
+subtitle.TextXAlignment = Enum.TextXAlignment.Left
+subtitle.Parent = header
+
+local close = Instance.new("TextButton")
+close.Size = UDim2.fromOffset(35, 35)
+close.Position = UDim2.new(1, -48, 0, 14)
+close.BackgroundColor3 = CARD
+close.Text = "×"
+close.TextColor3 = TEXT
+close.TextSize = 25
+close.Font = Enum.Font.Gotham
+close.Parent = header
+
+Instance.new("UICorner", close).CornerRadius =
+    UDim.new(0, 8)
+
+close.MouseButton1Click:Connect(function()
+    gui:Destroy()
+end)
+
+-- BARRA LATERAL
+local sidebar = Instance.new("Frame")
+sidebar.Position = UDim2.fromOffset(12, 78)
+sidebar.Size = UDim2.fromOffset(175, 350)
+sidebar.BackgroundTransparency = 1
+sidebar.Parent = window
+
+local sideLayout = Instance.new("UIListLayout")
+sideLayout.Padding = UDim.new(0, 8)
+sideLayout.SortOrder = Enum.SortOrder.LayoutOrder
+sideLayout.Parent = sidebar
+
+-- CONTENIDO
+local content = Instance.new("ScrollingFrame")
+content.Name = "PageContent"
+content.Position = UDim2.fromOffset(200, 78)
+content.Size = UDim2.new(1, -215, 1, -95)
+content.BackgroundTransparency = 1
+content.BorderSizePixel = 0
+content.ScrollBarThickness = 4
+content.ScrollBarImageColor3 = PURPLE
+content.CanvasSize = UDim2.new(0, 0, 0, 0)
+content.AutomaticCanvasSize = Enum.AutomaticSize.Y
+content.Parent = window
+
+local layout = Instance.new("UIListLayout")
+layout.Padding = UDim.new(0, 10)
+layout.SortOrder = Enum.SortOrder.LayoutOrder
+layout.Parent = content
+
+local padding = Instance.new("UIPadding")
+padding.PaddingTop = UDim.new(0, 4)
+padding.PaddingRight = UDim.new(0, 8)
+padding.PaddingBottom = UDim.new(0, 10)
+padding.Parent = content
+
+-- FUNCIONES DE INTERFAZ
+local function clearPage()
+    for _, obj in ipairs(content:GetChildren()) do
+        if not obj:IsA("UIListLayout")
+            and not obj:IsA("UIPadding") then
+            obj:Destroy()
+        end
+    end
+end
+
+local function section(text)
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, -4, 0, 32)
+    label.BackgroundTransparency = 1
+    label.Text = text
+    label.TextColor3 = TEXT
+    label.Font = Enum.Font.GothamBold
+    label.TextSize = 17
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Parent = content
+    return label
+end
+
+local function info(text)
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, -4, 0, 34)
+    label.BackgroundTransparency = 1
+    label.Text = text
+    label.TextColor3 = MUTED
+    label.Font = Enum.Font.Gotham
+    label.TextSize = 13
+    label.TextWrapped = true
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Parent = content
+    return label
+end
+
+local function makeButton(text, callback)
+    local button = Instance.new("TextButton")
+    button.Size = UDim2.new(1, -4, 0, 40)
+    button.BackgroundColor3 = CARD
+    button.BorderSizePixel = 0
+    button.Text = text
+    button.TextColor3 = TEXT
+    button.Font = Enum.Font.GothamMedium
+    button.TextSize = 14
+    button.Parent = content
+
+    Instance.new("UICorner", button).CornerRadius =
+        UDim.new(0, 8)
+
+    button.MouseButton1Click:Connect(function()
+        if callback then
+            callback(button)
+        end
+    end)
+
+    return button
+end
+
+local function toggle(text, callback)
+    local enabled = false
+    local button = makeButton(text .. "   [OFF]", function(b)
+        enabled = not enabled
+
+        b.Text = text ..
+            (enabled and "   [ON]" or "   [OFF]")
+
+        b.BackgroundColor3 = enabled
+            and Color3.fromRGB(67, 40, 105)
+            or CARD
+
+        if callback then
+            callback(enabled)
+        end
+    end)
+
+    return button
+end
+
+local function slider(text, minimum, maximum, initial, callback)
+    local value = initial
+
+    local button = makeButton(
+        text .. ": " .. tostring(value) .. "  [+]",
+        function(b)
+            value = value + 10
+            if value > maximum then
+                value = minimum
+            end
+
+            b.Text = text .. ": " ..
+                tostring(value) .. "  [+]"
+
+            if callback then
+                callback(value)
+            end
+        end
+    )
+
+    return button
+end
+
+-- PAGINAS
+local function showPage(page)
+    clearPage()
+
+    if page == "Main" then
+        section("Welcome to Neko Hub")
+        info("Dark interface • Purple accents")
+        info("RightShift: show / hide menu")
+        makeButton("About Neko Hub", function()
+            section("About")
+            info("A visual training UI for your own Roblox experience.")
+        end)
+
+    elseif page == "Aim legítimo" then
+        section("AIM LEGÍTIMO")
+        info("Herramientas de práctica para tu propio juego.")
+
+        toggle("Practice Mode")
+        toggle("Training Target Indicator")
+        toggle("Show FOV Circle")
+
+        slider("Training FOV Radius", 50, 200, 100)
+        slider("Practice Sensitivity", 10, 100, 50)
+
+        info("Los controles son demostrativos; no apuntan a jugadores.")
+
+    elseif page == "Aim baneable" then
+        section("AIM BANEABLE")
+        info("Categoría informativa: las funciones de trampas están desactivadas.")
+        makeButton("Silent Aim — No disponible")
+        makeButton("Triggerbot — No disponible")
+        makeButton("AutoShoot — No disponible")
+        makeButton("Silent FOV — Solo demo visual")
+        makeButton("Anti-ban — No disponible")
+        info("No se incluye evasión de detección ni automatización de combate.")
+
+    elseif page == "Skins" then
+        section("SKIN STUDIO")
+        info("Selector visual de demostración.")
+
+        local skins = {
+            "Default",
+            "Valkyrie",
+            "Shadow",
+            "Purple Flame"
+        }
+
+        for _, skinName in ipairs(skins) do
+            makeButton(skinName, function(b)
+                for _, obj in ipairs(content:GetChildren()) do
+                    if obj:IsA("TextButton") then
+                        obj.BackgroundColor3 = CARD
+                    end
+                end
+
+                b.BackgroundColor3 =
+                    Color3.fromRGB(67, 40, 105)
+
+                print("Preset de demo seleccionado:", skinName)
+            end)
+        end
+
+        info("Los presets no desbloquean skins del juego real.")
+
+    elseif page == "Macro" then
+        section("MACRO & KEYBINDS")
+        info("RightShift: abrir / ocultar el hub")
+        info("Los atajos de esta demo controlan solo la interfaz.")
+        toggle("Training Reminder")
+
+    elseif page == "Inventory" then
+        section("INVENTORY PREVIEW")
+        info("Inventario ficticio de demostración.")
+        makeButton("Valkyrie — Preview")
+        makeButton("Shadow — Preview")
+        makeButton("Default — Preview")
+        info("Los objetos mostrados aquí no son intercambiables.")
+
+    elseif page == "Settings" then
+        section("SETTINGS")
+
+        toggle("Blue Accent Theme", function(enabled)
+            stroke.Color = enabled
+                and Color3.fromRGB(75, 160, 255)
+                or PURPLE
+        end)
+
+        toggle("Compact Header", function(enabled)
+            title.TextSize = enabled and 18 or 22
+        end)
+
+        makeButton("Close Neko Hub", function()
+            gui:Destroy()
+        end)
+    end
+end
+
+-- BOTONES DEL MENÚ
+local pages = {
+    "Main",
+    "Aim legítimo",
+    "Aim baneable",
+    "Skins",
+    "Inventory",
+    "Macro",
+    "Settings"
+}
+
+for _, page in ipairs(pages) do
+    local button = Instance.new("TextButton")
+    button.Size = UDim2.new(1, 0, 0, 40)
+    button.BackgroundColor3 = CARD
+    button.BorderSizePixel = 0
+    button.Text = page
+    button.TextColor3 = TEXT
+    button.Font = Enum.Font.GothamMedium
+    button.TextSize = 13
+    button.Parent = sidebar
+
+    Instance.new("UICorner", button).CornerRadius =
+        UDim.new(0, 8)
+
+    button.MouseButton1Click:Connect(function()
+        for _, item in ipairs(sidebar:GetChildren()) do
+            if item:IsA("TextButton") then
+                item.BackgroundColor3 = CARD
+            end
+        end
+
+        button.BackgroundColor3 =
+            Color3.fromRGB(67, 40, 105)
+
+        showPage(page)
+    end)
+end
+
+-- TECLA PARA OCULTAR / MOSTRAR
+UIS.InputBegan:Connect(function(input, processed)
+    if processed then return end
+
+    if input.KeyCode == Enum.KeyCode.RightShift then
+        window.Visible = not window.Visible
+    end
+end)
+
+showPage("Main")
+
+print("Neko Hub loaded successfully")
